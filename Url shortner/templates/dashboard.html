@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://kit.fontawesome.com/0a44d989c2.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="/static/styles.css">
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="/">Flask - Bit.ly Clone</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                  <a class="nav-link" href="/">Shorten Your URL <span class="sr-only">(current)</span></a>
+                </li>
+                {% if session["user_id"] %}
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                {% endif %}
+                {% if session["user_id"] %}
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                {% endif %}
+              </ul>
+              {% if not session["user_id"] %}
+                <span class="navbar-text">
+                    <a href="/register">Register</a>
+                    <a href="/login">Login</a>
+                </span>
+              {% endif %}
+            </div>
+        </nav>
+        <script>
+            function displayInfo(originalUrl, newUrl, timestamp, click, id) {
+                document.getElementById("original_url").textContent = originalUrl;
+                document.getElementById("original_url_a").textContent = originalUrl;
+                document.getElementById("new_url").textContent = newUrl;
+                document.getElementById("timestamp").textContent = timestamp;
+                document.getElementById("click_count").textContent = click;
+                document.getElementById("id").textContent = id;
+            }
+
+            function copyToClipboard(element) {
+                var $temp = $("<input>");
+                $("body").append($temp);
+                $temp.val($(element).text()).select();
+                document.execCommand("copy");
+                $temp.remove();
+            }
+        </script>
+
+        {% if urls|length != 0 %}
+        <div class="row">
+            <div class="col-4">
+            {% for url in urls %}
+                <div class="url" onclick="displayInfo('{{ url[1] }}', '{{ BASE_URL }}{{ url[3] }}', '{{ url[5] }}', '{{ url[6] }}', '{{ url[0] }}')">
+                <small>{{ url[4] }}</small>
+                <p>{{ url[1] }}</p>
+                <a href="{{ BASE_URL }}{{ url[3] }}" style="font-size: 10px;" class="new">{{ BASE_URL }}{{ url[3] }}</a>
+                <span class="clicks"><small>{{ url[7] }}</small> click(s) <i class="fas fa-mouse-pointer"></i></span>
+                <hr>
+                </div>
+            {% endfor %}
+            </div>
+            <div class="col">
+            <small>CREATED in <span id="timestamp">{{ urls[0][5] }}</span></small>
+            <h2><span id="original_url">{{ urls[0][1] }}</span></h2>
+            <small><span><a href="{{ urls[0][1] }}"  id="original_url_a">{{ urls[0][1] }}</span></a></small>
+            <br><br><br>
+            <small><span id="new_url">{{ BASE_URL }}{{ urls[0][3] }}</span></small>
+            <small style="color: white" id="id">{{ urls[0][0] }}</small>
+            <button type="button" id="copy" class="btn btn-info" data-container="body" data-toggle="popover" data-placement="right" data-content="Copied" onclick="copyToClipboard('#new_url')">Copy</button>
+            <button type="button" id="edit" class="btn btn-info" onclick="window.location.replace(`/update?id=${document.getElementById('id').textContent}`);">Edit</button>
+            <hr>
+                <span><span id="click_count">{{ urls[0][7] }}</span> click(s) <i class="fas fa-mouse-pointer"></i></span>
+            </div>
+        </div>
+        {% endif %}
+
+        <script>
+            $(function () {
+                $('[data-toggle="popover"]').popover()
+            })
+        </script>
+    </body>
+</html>

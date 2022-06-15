@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block main %}
+<div class="jumbotron">
+    <h1 class="display-4">Flask Project | Bit.ly Clone | A URL Shortener</h1>
+  </div>
+    <form action="/" method="POST">
+        <div class="form-group">
+            <label for="exampleInputEmail1">URL</label>
+            <input type="url" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="url">
+            <small id="emailHelp" class="form-text text-muted">Put the URL that you want to shorten here</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    <br>
+    {% if not session["user_id"] %}
+        <h2>URLs Created</h2>
+        <ul id="urls"></ul>
+        <script>
+            var urlsCount = localStorage.getItem("urls-count");
+            if (urlsCount != 0) {
+                for (let i = 0; i < urlsCount; i++) {
+                    var oldUrl = localStorage.getItem(`url-${i+1}-old`);
+                    var newUrl = localStorage.getItem(`url-${i+1}-new`);
+
+                    var a = document.createElement('a');
+                    var linkText = document.createTextNode(newUrl);
+                    a.appendChild(linkText);
+                    a.title = newUrl;
+                    a.href = newUrl;
+                    document.getElementById("urls").appendChild(a);
+
+                    var node = document.createElement("LI");
+                    var textnode = document.createTextNode(`${oldUrl}`);
+                    node.appendChild(textnode);
+                    document.getElementById("urls").appendChild(node);
+                }
+            }
+        </script>
+    {% endif %}
+{% endblock %}
